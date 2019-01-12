@@ -338,12 +338,8 @@ public class EarthquakeCityMap extends PApplet {
 
 		strokeWeight(2);
 		line(centerx-8, centery-8, centerx+8, centery+8);
-		line(centerx-8, centery+8, centerx+8, centery-8);
-		
-		
+		line(centerx-8, centery+8, centerx+8, centery-8);	
 	}
-
-	
 	
 	// Checks whether this quake occurred on land.  If it did, it sets the 
 	// "country" property of its PointFeature to the country where it occurred
