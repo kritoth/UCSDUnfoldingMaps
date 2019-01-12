@@ -1,5 +1,6 @@
 package module4;
 
+import de.fhpotsdam.unfolding.providers.Microsoft;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -60,7 +61,7 @@ public class EarthquakeCityMap extends PApplet {
 	// A List of country markers
 	private List<Marker> countryMarkers;
 	
-	public void setup() {		
+	public void setup() {	
 		// (1) Initializing canvas and map tiles
 		size(900, 700, OPENGL);
 		if (offline) {
@@ -68,7 +69,7 @@ public class EarthquakeCityMap extends PApplet {
 		    earthquakesURL = "2.5_week.atom";  // The same feed, but saved August 7, 2015
 		}
 		else {
-			map = new UnfoldingMap(this, 200, 50, 650, 600, new Google.GoogleMapProvider());
+			map = new UnfoldingMap(this, 200, 50, 650, 600, new Microsoft.HybridProvider()); //or: new Google.GoogleMapProvider()
 			// IF YOU WANT TO TEST WITH A LOCAL FILE, uncomment the next line
 		    //earthquakesURL = "2.5_week.atom";
 		}
@@ -80,7 +81,7 @@ public class EarthquakeCityMap extends PApplet {
 		//earthquakesURL = "test2.atom";
 		
 		// WHEN TAKING THIS QUIZ: Uncomment the next line
-		//earthquakesURL = "quiz1.atom";
+		earthquakesURL = "quiz1.atom";
 		
 		
 		// (2) Reading in earthquake data and geometric properties
@@ -121,17 +122,15 @@ public class EarthquakeCityMap extends PApplet {
 	    
 	}  // End setup
 	
-	
 	public void draw() {
 		background(0);
 		map.draw();
 		addKey();
-		
 	}
 	
 	// helper method to draw key in GUI
 	// TODO: Update this method as appropriate
-	private void addKey() {	
+	private void addKey() {
 		// Remember you can use Processing's graphics methods here
 		fill(255, 250, 240);
 		rect(25, 50, 150, 250);
@@ -141,27 +140,42 @@ public class EarthquakeCityMap extends PApplet {
 		textSize(12);
 		text("Earthquake Key", 50, 75);
 		
-		fill(color(255, 0, 0));
-		ellipse(50, 125, 15, 15);
-		fill(color(255, 255, 0));
-		ellipse(50, 175, 10, 10);
-		fill(color(0, 0, 255));
-		ellipse(50, 225, 5, 5);
+		fill(255, 0, 0);//red
+		triangle(44, 112, 50, 102, 56, 112);
 		
-		fill(0, 0, 0);
-		text("5.0+ Magnitude", 75, 125);
-		text("4.0+ Magnitude", 75, 175);
-		text("Below 4.0", 75, 225);
-	}
+		fill(255,255,255);//white
+		ellipse(50, 130, 10, 10);
+		rect(45, 145, 10, 10);
+		
+		ellipse(50, 260, 10, 10);
+		line(45, 255, 55, 265);
+		line(45, 265, 55, 255);
+		
+		fill(color(255, 255, 0));//yellow
+		ellipse(50, 195, 10, 10);
+		fill(color(0, 0, 255));//blue
+		ellipse(50, 215, 10, 10);
+		fill(color(255, 0, 0));//red
+		ellipse(50, 237, 10, 10);
+		
 
-	
+		fill(0, 0, 0);//black
+		text("City marker", 75, 105);
+		
+		text("Land quake", 75, 130);
+		text("Ocean quake", 75, 150);
+		
+		text("Shallow", 75, 195);
+		text("Intermediate", 75, 215);
+		text("Deep", 75, 237);
+		text("Past day", 75, 260);
+	}
 	
 	// Checks whether this quake occurred on land.  If it did, it sets the 
 	// "country" property of its PointFeature to the country where it occurred
 	// and returns true.  Notice that the helper method isInCountry will
 	// set this "country" property already.  Otherwise it returns false.
 	private boolean isLand(PointFeature earthquake) {
-		
 		
 		// Loop over all the country markers.  
 		// For each, check if the earthquake PointFeature is in the 
@@ -170,10 +184,10 @@ public class EarthquakeCityMap extends PApplet {
 		// If isInCountry ever returns true, isLand should return true.
 		for (Marker m : countryMarkers) {
 			// TODO: Finish this method using the helper method isInCountry
-			
+			if(isInCountry(earthquake, m)) {
+				return true;
+			}
 		}
-		
-		
 		// not inside any country
 		return false;
 	}
@@ -184,8 +198,7 @@ public class EarthquakeCityMap extends PApplet {
 	 * ...
 	 * OCEAN QUAKES: numOceanQuakes
 	 * */
-	private void printQuakes() 
-	{
+	private void printQuakes() {
 		// TODO: Implement this method
 		// One (inefficient but correct) approach is to:
 		//   Loop over all of the countries, e.g. using 
@@ -210,7 +223,22 @@ public class EarthquakeCityMap extends PApplet {
 		//  * If you know your Marker, m, is a LandQuakeMarker, then it has a "country" 
 		//      property set.  You can get the country with:
 		//        String country = (String)m.getProperty("country");
-		
+		int oceanCounter = quakeMarkers.size();
+		for (Marker cm : countryMarkers) { 
+			int landCounter = 0;
+			
+			String countryName = (String)cm.getProperty("name");
+			for(Marker qm : quakeMarkers) {
+				if(((EarthquakeMarker)qm).isOnLand && ((LandQuakeMarker)qm).getCountry().equals(countryName)) {
+					landCounter++;
+					oceanCounter--;
+				}
+			}
+			if(landCounter > 0) {
+				System.out.println(countryName + ": " + landCounter);
+			}
+		}
+		System.out.println("In the ocean: " + oceanCounter);
 		
 	}
 	

@@ -1,5 +1,7 @@
 package module4;
 
+import java.awt.Color;
+
 import de.fhpotsdam.unfolding.data.PointFeature;
 import de.fhpotsdam.unfolding.marker.SimplePointMarker;
 import processing.core.PGraphics;
@@ -10,9 +12,7 @@ import processing.core.PGraphics;
  * @author Your name here
  *
  */
-public abstract class EarthquakeMarker extends SimplePointMarker
-{
-	
+public abstract class EarthquakeMarker extends SimplePointMarker{
 	// Did the earthquake occur on land?  This will be set by the subclasses.
 	protected boolean isOnLand;
 
@@ -23,9 +23,6 @@ public abstract class EarthquakeMarker extends SimplePointMarker
 	// You will want to set this in the constructor, either
 	// using the thresholds below, or a continuous function
 	// based on magnitude. 
-  
-	
-	
 	/** Greater than or equal to this threshold is a moderate earthquake */
 	public static final float THRESHOLD_MODERATE = 5;
 	/** Greater than or equal to this threshold is a light earthquake */
@@ -37,15 +34,16 @@ public abstract class EarthquakeMarker extends SimplePointMarker
 	public static final float THRESHOLD_DEEP = 300;
 
 	// ADD constants for colors
-
+	//see: https://www.shodor.org/stella2java/rgbint.html
+	private static final int RED = 16711680;
+	private static final int BLUE = 255;
+	private static final int YELLOW = 16776960;
 	
 	// abstract method implemented in derived classes
 	public abstract void drawEarthquake(PGraphics pg, float x, float y);
 		
-	
 	// constructor
-	public EarthquakeMarker (PointFeature feature) 
-	{
+	public EarthquakeMarker (PointFeature feature) {
 		super(feature.getLocation());
 		// Add a radius property and then set the properties
 		java.util.HashMap<String, Object> properties = feature.getProperties();
@@ -55,7 +53,6 @@ public abstract class EarthquakeMarker extends SimplePointMarker
 		this.radius = 1.75f*getMagnitude();
 	}
 	
-
 	// calls abstract method drawEarthquake and then checks age and draws X if needed
 	public void draw(PGraphics pg, float x, float y) {
 		// save previous styling
@@ -67,11 +64,14 @@ public abstract class EarthquakeMarker extends SimplePointMarker
 		// call abstract method implemented in child class to draw marker shape
 		drawEarthquake(pg, x, y);
 		
-		// OPTIONAL TODO: draw X over marker if within past day		
+		// OPTIONAL TODO: draw X over marker if within past day	
+		if(getAge().equals("Past Day")) {
+			pg.line(x-7, y-7, x+7, y+7);
+			pg.line(x-7, y+7, x+7, y-7);
+		}
 		
 		// reset to previous styling
 		pg.popStyle();
-		
 	}
 	
 	// determine color of marker from depth, and set pg's fill color 
@@ -81,8 +81,16 @@ public abstract class EarthquakeMarker extends SimplePointMarker
 	// You might find the getters below helpful.
 	private void colorDetermine(PGraphics pg) {
 		//TODO: Implement this method
+		if(getDepth() >= THRESHOLD_DEEP) {
+			pg.fill(255,0,0);
+		}
+		else if(getDepth() >= THRESHOLD_INTERMEDIATE) {
+			pg.fill(0,0,255);
+		}
+		else {
+			pg.fill(255,255,0);
+		}
 	}
-	
 	
 	/*
 	 * getters for earthquake properties
@@ -98,17 +106,18 @@ public abstract class EarthquakeMarker extends SimplePointMarker
 	
 	public String getTitle() {
 		return (String) getProperty("title");	
-		
 	}
 	
 	public float getRadius() {
 		return Float.parseFloat(getProperty("radius").toString());
 	}
 	
-	public boolean isOnLand()
-	{
+	public boolean isOnLand(){
 		return isOnLand;
 	}
 	
+	public String getAge() {
+		return (String) getProperty("age");
+	}
 	
 }
