@@ -278,5 +278,58 @@ public class ParseFeed {
 	}
 	
 	
+	/*
+	 * This method is to parse a file containing fertility rate information from
+	 * the world bank.  
+	 * The file and its format can be found: 
+	 * https://data.worldbank.org/indicator/SP.DYN.TFRT.IN
+	 * 
+	 * It is also included with the UC San Diego MOOC package 
+	 * in the file API_SP.ADO.TFRT_DS2_en_csv_v2_10230801.csv
+	 * 
+	 * @param p - PApplet being used
+	 * @param fileName - file name or URL for data source
+	 * @return A HashMap of country->fertility rate
+	 */
+	public static HashMap<String, Float> loadFertilityRateFromCSV(PApplet p, String fileName) {
+		// Key: country ID; Value: fertRate
+		HashMap<String, Float> fertilityRateMap = new HashMap<String, Float>();
+
+		// get lines of csv file
+		String[] rows = p.loadStrings(fileName);
+		
+		// Reads country name and population density value from CSV row
+		for (String row : rows) {
+			// split row by commas not in quotations
+			String[] columns = row.split(",(?=([^\"]*\"[^\"]*\")*[^\"]*$)");
+			
+			// check if there is any fertility rate data from any year, get most recent
+			for(int i = columns.length - 1; i > 3; i--) {
+				// check if value exists for year
+				// AND it is a float number, ie. contains a dot "."
+				if(!columns[i].equals("\"\"") && columns[i].contains(".")) {
+					String key = trimQuotes(columns[1]);
+					String value = trimQuotes(columns[i]);
+					fertilityRateMap.put(key, Float.parseFloat(value));
+					
+					// break once most recent data is found
+					break;
+				}
+			}
+		}
+
+		return fertilityRateMap;
+	}
+	
+	private static String trimQuotes(String s) {
+		
+		if(s.startsWith("\"")) {
+			s = s.substring(1);
+		}
+		if(s.endsWith("\"")) {
+			s = s.substring(0, s.length()-1);
+		}
+		return s;
+	}
 
 }
