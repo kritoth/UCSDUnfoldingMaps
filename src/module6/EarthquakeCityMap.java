@@ -2,6 +2,7 @@ package module6;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import de.fhpotsdam.unfolding.UnfoldingMap;
@@ -85,7 +86,7 @@ public class EarthquakeCityMap extends PApplet {
 		//earthquakesURL = "test2.atom";
 		
 		// Uncomment this line to take the quiz
-		//earthquakesURL = "quiz2.atom";
+		earthquakesURL = "quiz2.atom";
 		
 		
 		// (2) Reading in earthquake data and geometric properties
@@ -124,6 +125,10 @@ public class EarthquakeCityMap extends PApplet {
 	    map.addMarkers(quakeMarkers);
 	    map.addMarkers(cityMarkers);
 	    
+	    //	STEP 4: check sortAndPrint(int numToPrint)
+	    int numToPrint = 20;
+	    System.out.println("After sorting, the largest " + numToPrint + " are:");
+	    sortAndPrint(numToPrint);
 	    
 	}  // End setup
 	
@@ -139,6 +144,18 @@ public class EarthquakeCityMap extends PApplet {
 	// TODO: Add the method:
 	//   private void sortAndPrint(int numToPrint)
 	// and then call that method from setUp
+	private void sortAndPrint(int numToPrint) {
+		EarthquakeMarker[] markers =  new EarthquakeMarker[quakeMarkers.size()];
+		markers = quakeMarkers.toArray(markers);
+		Arrays.sort(markers);
+		for(int i=0;i<markers.length;i++) {
+			if(i < numToPrint) {
+				System.out.println(markers[i]);
+			}
+			else break;
+		}
+	}
+	
 	
 	/** Event handler that gets called automatically when the 
 	 * mouse moves.
